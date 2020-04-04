@@ -1,0 +1,61 @@
+spring:
+  main:
+    web-application-type: none
+#  data:
+#    mongodb:
+#      host: 10.15.12.227
+#      port: 27017
+#      database: resourcedb
+  rabbitmq:
+    host: 10.15.12.151
+    port: 5672
+    username: root
+    password: root
+  redis:
+    hostname: 10.15.12.151
+    port: 6379
+    password: root
+    jedis:
+      pool:
+        max-active: 1000
+        min-idle: 0
+        max-wait: -1
+        max-idle: 10
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.15.12.151:3306/agri_auth?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  mail:
+    host: 172.24.104.10
+    port: 25
+    username: ssdclab
+    password: Ssdc123!
+    protocol: smtp
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    cache-duration: -1
+
+jhipster:
+  mail: # specific JHipster mail property, for standard properties see MailProperties
+    from: ssdclab@vnpt-technology.vn
+    base-url: http://10.15.12.151:9090
+
+application:
+  activation:
+    expirePeriodActiveMail: 2592000 #seconds - 30days
+    expirePeriodResetPassword: 86400 #seconds - 1day
+    enableMail: true #true/false
+  subNameQueue: for-test
+  timeAfterSoftDelete: 2592000
+  tokenTime:
+    remember: 2592000 #seconds - 30days
+    noRemember: 1800 # seconds - 0.5h
