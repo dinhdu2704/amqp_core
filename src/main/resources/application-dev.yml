@@ -7,12 +7,12 @@ spring:
 #      port: 27017
 #      database: resourcedb
   rabbitmq:
-    host: 10.15.12.151
+    host: one-home-rabitmq
     port: 5672
     username: root
     password: root
   redis:
-    hostname: 10.15.12.151
+    hostname: one-home-redis
     port: 6379
     password: root
     jedis:
@@ -23,7 +23,7 @@ spring:
         max-idle: 10
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://10.15.12.151:3306/agri_auth?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://one-home-database:3306/home_payment?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: root
     password: root
   jpa:
@@ -54,8 +54,7 @@ application:
     expirePeriodActiveMail: 2592000 #seconds - 30days
     expirePeriodResetPassword: 86400 #seconds - 1day
     enableMail: true #true/false
-  subNameQueue: dev
   timeAfterSoftDelete: 2592000
   tokenTime:
     remember: 2592000 #seconds - 30days
-    noRemember: 1800 # seconds - 0.5h
+    noRemember: 2592000 # seconds - 30days

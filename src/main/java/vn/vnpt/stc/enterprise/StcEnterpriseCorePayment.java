@@ -17,15 +17,15 @@ import vn.vnpt.stc.enterprise.configuration.ApplicationProperties;
 )
 @EnableScheduling
 @EnableConfigurationProperties(ApplicationProperties.class)
-public class StcEnterpriseCoreSmartFarm {
-    private static Logger logger = LoggerFactory.getLogger(StcEnterpriseCoreSmartFarm.class);
+public class StcEnterpriseCorePayment {
+    private static Logger logger = LoggerFactory.getLogger(StcEnterpriseCorePayment.class);
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
-        logger.info("#{} have just started up", StcEnterpriseCoreSmartFarm.class.getSimpleName());
+        logger.info("#{} have just started up", StcEnterpriseCorePayment.class.getSimpleName());
     }
     public static void main(String[] args) {
-        SpringApplication.run(StcEnterpriseCoreSmartFarm.class, args);
+        SpringApplication.run(StcEnterpriseCorePayment.class, args);
     }
 
 }

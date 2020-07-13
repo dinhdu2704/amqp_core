@@ -2,6 +2,7 @@ package vn.vnpt.stc.enterprise.event.amqp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.context.ApplicationContext;
 import vn.vnpt.stc.enterpise.commons.event.Event;
@@ -47,6 +48,12 @@ public class AMQPEventBus implements EventBus {
     }
 
     @Override
+    public Event publish(String routingKey, Event event, MessageProperties messageProperties) {
+        AMQPEventPublisher publisher = publishers.get(TOPIC_EXCHANGE_NAME_DEFAULT);
+        return publisher.publish(routingKey,event, messageProperties);
+    }
+
+    @Override
     public Event publish(String topicExchange, String routingKey, Event event) {
         AMQPEventPublisher publisher = publishers.get(topicExchange);
         if (publisher == null) {
@@ -54,6 +61,16 @@ public class AMQPEventBus implements EventBus {
             publishers.put(topicExchange, publisher);
         }
         return publisher.publish(routingKey,event);
+    }
+
+    @Override
+    public Event publish(String topicExchange, String routingKey, Event event, MessageProperties messageProperties) {
+        AMQPEventPublisher publisher = publishers.get(topicExchange);
+        if (publisher == null) {
+            publisher = new AMQPEventPublisher(connectionFactory, topicExchange);
+            publishers.put(topicExchange, publisher);
+        }
+        return publisher.publish(routingKey,event, messageProperties);
     }
 
     @Override

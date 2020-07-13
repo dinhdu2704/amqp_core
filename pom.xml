@@ -10,11 +10,11 @@
     </parent>
 
     <groupId>vn.vnpt.stc.enterprise</groupId>
-    <artifactId>agri-core-smart-farm</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>core-payment</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
-    <name>technology-agriculture-core-smart-farm</name>
-    <description>Technology Agriculture Core Smart Farm</description>
+    <name>stc-enterprise-core-payment</name>
+    <description>ONE Home Core Payment</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>vn.vnpt.stc.enterprise</groupId>
-            <artifactId>common-libs</artifactId>
+            <artifactId>commons</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--<dependency>-->
@@ -129,11 +129,6 @@
             <version>1.5.6</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
-        </dependency>
-        <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
             <version>2.1.5.RELEASE</version>
@@ -150,14 +145,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.4.2</version>
-                <configuration>
-                    <propertyFile>src/main/resources/liquibase/liquibase.properties</propertyFile>
-                </configuration>
             </plugin>
         </plugins>
     </build>

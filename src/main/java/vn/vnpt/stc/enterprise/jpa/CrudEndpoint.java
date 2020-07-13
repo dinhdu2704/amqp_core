@@ -6,6 +6,7 @@ import vn.vnpt.stc.enterpise.commons.constants.QueueConstants;
 import vn.vnpt.stc.enterpise.commons.constants.RoutingKeyConstants;
 import vn.vnpt.stc.enterpise.commons.entities.jpa.core.IdEntity;
 import vn.vnpt.stc.enterpise.commons.event.Event;
+import vn.vnpt.stc.enterpise.commons.event.EventType;
 import vn.vnpt.stc.enterprise.event.EventBus;
 
 import java.io.Serializable;
@@ -31,6 +32,7 @@ public abstract class CrudEndpoint<T extends IdEntity, ID extends Serializable> 
 
     public void process(Event event){
         event = service.process(event);
-        eventBus.publish(QueueConstants.TOPIC_EXCHANGE_EXTERNAL, RoutingKeyConstants.HTTP_GW_ROUTING_KEY, event);
+        event.type = EventType.RESPONSE;
+        eventBus.publish(event.topicExchangeResponse, event.routingKeyResponse, event);
     }
 }

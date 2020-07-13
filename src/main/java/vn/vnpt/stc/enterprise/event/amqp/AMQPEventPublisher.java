@@ -1,5 +1,9 @@
 package vn.vnpt.stc.enterprise.event.amqp;
 
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import vn.vnpt.stc.enterpise.commons.event.Event;
@@ -41,19 +45,44 @@ public class AMQPEventPublisher extends AMQPAbstractConfiguration {
         return event;
     }
 
+    public Event publish(String routingKey, Event event, MessageProperties messageProperties) {
+        if ((event.id == null)||(event.id.isEmpty())) {
+            event.id = UUID.randomUUID().toString();
+        }
+        pool.submit(new PublishEventTask(routingKey, event, messageProperties));
+        return event;
+    }
+
     private class PublishEventTask implements Runnable {
 
-        private Event event;
         private String routingKey;
+        private MessageProperties messageProperties;
+        private Object message;
 
         public PublishEventTask(String routingKey, Event event) {
             this.routingKey = routingKey;
-            this.event = event;
+            this.message = event;
+        }
+
+        public PublishEventTask(String routingKey, Event event, MessageProperties messageProperties) {
+            this.routingKey = routingKey;
+            if (messageProperties != null) {
+                this.messageProperties = messageProperties;
+                this.message = rabbitTemplate().getMessageConverter().toMessage(event, messageProperties);
+            } else {
+                this.message = event;
+            }
         }
 
         @Override
         public void run() {
-            rabbitTemplate().convertAndSend(routingKey, event);
+            rabbitTemplate().convertAndSend(routingKey, message, new MessagePostProcessor() {
+                @Override
+                public Message postProcessMessage(Message m) throws AmqpException {
+                    m.getMessageProperties().setContentType("application/json");
+                    return m;
+                }
+            });
         }
 
     }

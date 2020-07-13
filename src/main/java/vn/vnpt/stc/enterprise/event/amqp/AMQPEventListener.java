@@ -14,8 +14,6 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ErrorHandler;
-import vn.vnpt.stc.enterprise.configuration.ApplicationProperties;
-import vn.vnpt.stc.enterprise.configuration.SpringContext;
 import vn.vnpt.stc.enterprise.event.AMQPSubscriber;
 
 public class AMQPEventListener extends AMQPAbstractConfiguration {
@@ -43,10 +41,6 @@ public class AMQPEventListener extends AMQPAbstractConfiguration {
 
     }
 
-    private ApplicationProperties getApplicationProperties(){
-        return SpringContext.getBean(ApplicationProperties.class);
-    }
-
     public final Binding eventBinding() {
         Binding binding;
         amqpAdmin().declareExchange(topicExchange(this.topicExchangeName));
@@ -72,7 +66,7 @@ public class AMQPEventListener extends AMQPAbstractConfiguration {
             if (subscriber.getQueue().equals("")) {
                 queue = amqpAdmin().declareQueue();
             } else {
-                queue = new Queue(subscriber.getQueue() + "-" + getApplicationProperties().getSubNameQueue());
+                queue = new Queue(subscriber.getQueue());
                 amqpAdmin().declareQueue(queue);
             }
         }
@@ -80,7 +74,7 @@ public class AMQPEventListener extends AMQPAbstractConfiguration {
     }
 
     public MessageListenerAdapter messageListenerAdapter() {
-        return new MessageListenerAdapter(new MessageHandler(ctx, subscriber), jsonMessageConverter());
+        return new CustomMessageListenerAdapter(new MessageHandler(ctx, subscriber), jsonMessageConverter());
     }
 
     public class SimpleErrorHandler implements ErrorHandler {

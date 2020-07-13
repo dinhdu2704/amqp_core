@@ -11,39 +11,21 @@ import vn.vnpt.stc.enterpise.commons.event.Event;
 import vn.vnpt.stc.enterpise.commons.utils.ObjectMapperUtil;
 import vn.vnpt.stc.enterprise.utils.RequestUtils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 @Component
 public class TestTask {
-    //@Scheduled(fixedRate = 100000L)
-    public void test1(){
-        Event event = new Event();
-        event.method = MethodConstants.CURRENT_USER;
-        event.payload = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0dWFubnA0QG1haWxpbmF0b3IuY29tIiwiZXhwIjoxNTg4NDg4MzM4LCJ1c2VyX2lkIjoyMTQsInNjb3BlIjpbIlJPTEVfRkFSTV9BRE1JTiJdLCJ0ZW5hbnRfaWRzIjpbMTcsMjMsMjQsMjUsMjYsMjcsMjgsMjksMzBdfQ.hRaqITO-urLDxsfKfryGnBVHsx2WALEyXKkg_uG90Xc0il-gNhKncgMuSRgEXtgAO6B-UMHZJ1tmsofnmj_wNA";
+    public static void main(String[] args) {
+        String myDate = "1970/01/01 00:00:00";
+        LocalDateTime localDateTime = LocalDateTime.parse(myDate,
+                DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss") );
 
-        event = RequestUtils.amqp
-                (QueueConstants.TOPIC_EXCHANGE_INTERNAL, RoutingKeyConstants.ROUTING_KEY_USER, event);
+        long millis = localDateTime
+                .atZone(ZoneId.systemDefault())
+                .toInstant().toEpochMilli();
 
-        User user =  ObjectMapperUtil.objectMapper(event.payload, User.class);
-    }
-
-    //@Scheduled(fixedRate = 100000L)
-    public void test2(){
-        Long userId = 215L;
-        Event event = new Event();
-        event.payload = userId.toString();
-        event.method = MethodConstants.GET_TENANTS_OF_USER;
-        event = RequestUtils.amqp
-                (QueueConstants.TOPIC_EXCHANGE_INTERNAL, RoutingKeyConstants.ROUTING_KEY_TENANT, event);
-        ObjectList o = ObjectMapperUtil.objectMapper(event.payload, ObjectList.class);
-    }
-
-    //@Scheduled(fixedRate = 100000L)
-    public void test3(){
-        Long userId = 214L;
-        Event event = new Event();
-        event.payload = userId.toString();
-        event.method = MethodConstants.GET_TENANTS_OF_FARM_ADMIN;
-        event = RequestUtils.amqp
-                (QueueConstants.TOPIC_EXCHANGE_INTERNAL, RoutingKeyConstants.ROUTING_KEY_TENANT, event);
-        ObjectList o = ObjectMapperUtil.objectMapper(event.payload, ObjectList.class);
+        System.out.println("millis = " + millis);
     }
 }

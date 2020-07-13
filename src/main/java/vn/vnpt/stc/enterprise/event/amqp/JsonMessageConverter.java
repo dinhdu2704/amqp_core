@@ -10,6 +10,8 @@ import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.amqp.support.converter.MessageConverter;
 import vn.vnpt.stc.enterpise.commons.event.Event;
 
+import java.util.HashMap;
+
 public class JsonMessageConverter implements MessageConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonMessageConverter.class);
@@ -37,8 +39,11 @@ public class JsonMessageConverter implements MessageConverter {
         if(clazz == null) {
             throw new UnsupportedOperationException("Class must be set");
         }
+        HashMap<String, Object> incomingMessage = new HashMap<>();
         Object object = this.gson.fromJson(new String(message.getBody()),clazz);
+        incomingMessage.put("bodyObject", object);
+        incomingMessage.put("MessageProperties", message.getMessageProperties());
 
-        return object;
+        return incomingMessage;
     }
 }

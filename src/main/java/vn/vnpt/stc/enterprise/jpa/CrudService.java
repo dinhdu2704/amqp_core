@@ -16,20 +16,16 @@ import org.springframework.util.StringUtils;
 import vn.vnpt.stc.enterpise.commons.constants.Constants;
 import vn.vnpt.stc.enterpise.commons.constants.MethodConstants;
 import vn.vnpt.stc.enterpise.commons.constants.QueueConstants;
-import vn.vnpt.stc.enterpise.commons.constants.RoutingKeyConstants;
 import vn.vnpt.stc.enterpise.commons.entities.dto.IdInfo;
 import vn.vnpt.stc.enterpise.commons.entities.dto.PageInfo;
 import vn.vnpt.stc.enterpise.commons.entities.dto.SearchInfo;
 import vn.vnpt.stc.enterpise.commons.entities.jpa.core.IdEntity;
-import vn.vnpt.stc.enterpise.commons.entities.jpa.umgr.ObjectList;
 import vn.vnpt.stc.enterpise.commons.errors.ErrorInfo;
 import vn.vnpt.stc.enterpise.commons.errors.ErrorKey;
 import vn.vnpt.stc.enterpise.commons.event.Event;
 import vn.vnpt.stc.enterpise.commons.exceptions.RemoveSystemEntityException;
 import vn.vnpt.stc.enterpise.commons.rsql.jpa.CustomRsqlVisitor;
-import vn.vnpt.stc.enterpise.commons.utils.CommonUtil;
 import vn.vnpt.stc.enterpise.commons.utils.ObjectMapperUtil;
-import vn.vnpt.stc.enterprise.utils.RequestUtils;
 import vn.vnpt.stc.enterprise.utils.SecurityUtils;
 
 import javax.persistence.EntityNotFoundException;
@@ -37,7 +33,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -78,8 +73,6 @@ public class CrudService<T extends IdEntity, ID extends Serializable> {
                 return processSearch(event);
             case MethodConstants.SEARCH_FULL:
                 return processSearchFull(event);
-            case MethodConstants.GEN_FANCY_TREE:
-                return processGenFancyTree(event);
             default:
                 event.errorCode = QueueConstants.ResultStatus.ERROR;
                 return event;
@@ -441,75 +434,5 @@ public class CrudService<T extends IdEntity, ID extends Serializable> {
             t.setActive(Constants.EntityStatus.IN_ACTIVE);
             update(id, t);
         }
-    }
-
-    public T tenantFilter(T entity){
-        if(entity !=null && !SecurityUtils.isCurrentUserInRole(Constants.ROLE_SYSTEM_ADMIN)){
-            Set<Long>  tenantIds = getTenantIdsOfAdminUser(SecurityUtils.getUserId());     // only get object in same tenant
-            if(!tenantIds.contains(entity.getTenantId())){
-                entity = null;
-            }
-        }
-        return entity;
-    }
-
-    protected String tenantFilter(String query){
-        if(!SecurityUtils.isCurrentUserInRole(Constants.ROLE_SYSTEM_ADMIN)){
-            if(query !=null && !query.isEmpty()){
-                query +=";";
-            }
-            query +="tenantId=in=" + CommonUtil.convertSetLongToString(getTenantIdsOfAdminUser(SecurityUtils.getUserId()));
-
-        }
-        return query;
-    }
-
-    public T farmFilter(T entity){
-        if(entity !=null && !SecurityUtils.isCurrentUserInRole(Constants.ROLE_SYSTEM_ADMIN)){
-            Set<Long>  tenantIds = getTenantIdsOfUser(SecurityUtils.getUserId());     // only get object in same tenant
-            if(!tenantIds.contains(entity.getTenantId())){
-                entity = null;
-            }
-        }
-        return entity;
-    }
-
-    protected String farmFilter(String query){
-        if(!SecurityUtils.isCurrentUserInRole(Constants.ROLE_SYSTEM_ADMIN)){
-            if(query !=null && !query.isEmpty()){
-                query +=";";
-            }
-            query +="tenantId=in=" + CommonUtil.convertSetLongToString(getTenantIdsOfUser(SecurityUtils.getUserId()));
-
-        }
-        return query;
-    }
-
-    // tam de get one, sau do override
-    protected Event processGenFancyTree(Event event){
-        T entity = ObjectMapperUtil.objectMapper(event.payload, typeParameterClass);
-        event.payload = ObjectMapperUtil.toJsonString(create(entity));
-        event.errorCode = QueueConstants.ResultStatus.SUCCESS;
-        return event;
-    }
-
-    private Set<Long> getTenantIdsOfUser(Long userId){
-        Event event = new Event();
-        event.payload = userId.toString();
-        event.method = MethodConstants.GET_TENANTS_OF_USER;
-        event = RequestUtils.amqp
-                (QueueConstants.TOPIC_EXCHANGE_INTERNAL, RoutingKeyConstants.ROUTING_KEY_TENANT, event);
-        ObjectList o = ObjectMapperUtil.objectMapper(event.payload, ObjectList.class);
-        return o.getLongValues();
-    }
-
-    private Set<Long> getTenantIdsOfAdminUser(Long userId){
-        Event event = new Event();
-        event.payload = userId.toString();
-        event.method = MethodConstants.GET_TENANTS_OF_FARM_ADMIN;
-        event = RequestUtils.amqp
-                (QueueConstants.TOPIC_EXCHANGE_INTERNAL, RoutingKeyConstants.ROUTING_KEY_TENANT, event);
-        ObjectList o = ObjectMapperUtil.objectMapper(event.payload, ObjectList.class);
-        return o.getLongValues();
     }
 }

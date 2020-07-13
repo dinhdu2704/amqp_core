@@ -52,8 +52,8 @@ public class AnnotationProcessor {
             return null;
         }
 
-        if (m.getParameterTypes().length != 1) {
-            logger.error("Method " + m.getName() + " must take ONE argument.");
+        if (m.getParameterTypes().length != 2) {
+            logger.error("Method " + m.getName() + " must take TWO argument.");
             return null;
         }
 
